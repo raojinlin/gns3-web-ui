@@ -50,6 +50,7 @@ import { InterfaceLabelWidget } from '../../cartography/widgets/interface-label'
 import { LabelWidget } from '../../cartography/widgets/label';
 import { MapLinkNodeToLinkNodeConverter } from '../../cartography/converters/map/map-link-node-to-link-node-converter';
 import { ProjectMapMenuComponent } from './project-map-menu/project-map-menu.component';
+import { WebConsoleService } from '../../services/web-console.service';
 
 
 @Component({
@@ -67,6 +68,7 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
   public server: Server;
   private ws: Subject<any>;
   public isProjectMapMenuVisible: boolean = false;
+  public isConsoleVisible: boolean = false;
 
   tools = {
     selection: true,
@@ -113,7 +115,8 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
     private recentlyOpenedProjectService: RecentlyOpenedProjectService,
     private movingEventSource: MovingEventSource,
     private mapScaleService: MapScaleService,
-    private nodeCreatedLabelStylesFixer: NodeCreatedLabelStylesFixer
+    private nodeCreatedLabelStylesFixer: NodeCreatedLabelStylesFixer,
+    private webConsoleService: WebConsoleService
   ) {}
 
   ngOnInit() {
@@ -289,12 +292,17 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
       this.contextMenu.openMenuForListOfElements(drawings, nodes, labels, links, event.pageY, event.pageX);
     });
 
+    const onConsoleOpen = this.webConsoleService.isConsoleOpen.subscribe((isOpen: boolean) => {
+      this.isConsoleVisible = isOpen;
+    });
+
     this.subscriptions.push(onLinkContextMenu);
     this.subscriptions.push(onNodeContextMenu);
     this.subscriptions.push(onDrawingContextMenu);
     this.subscriptions.push(onContextMenu);
     this.subscriptions.push(onLabelContextMenu);
     this.subscriptions.push(onInterfaceLabelContextMenu);
+    this.subscriptions.push(onConsoleOpen);
     this.mapChangeDetectorRef.detectChanges();
   }
 

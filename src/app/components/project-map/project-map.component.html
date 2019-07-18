@@ -119,3 +119,6 @@
 <app-node-label-dragged [server]="server"></app-node-label-dragged>
 <app-text-added [server]="server" [project]="project" (drawingSaved)="onDrawingSaved()"> </app-text-added>
 <app-text-edited [server]="server"></app-text-edited>
+<div [ngStyle]="{'visibility': isConsoleVisible?'visible':'hidden'}" class="console">
+  <app-web-console [server]="server" [project]="project"></app-web-console>
+</div>
