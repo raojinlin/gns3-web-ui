@@ -9,7 +9,7 @@
       [nodes]="nodes"
     ></app-console-device-action>
     <app-web-console-action
-      *ngIf="!projectService.isReadOnly(project) && nodes.length===1"
+      *ngIf="!projectService.isReadOnly(project) && nodes.length===1 && !isElectronApp"
       [node]="nodes[0]"
     ></app-web-console-action>
     <app-duplicate-action *ngIf="drawings.length>0 || nodes.length>0"

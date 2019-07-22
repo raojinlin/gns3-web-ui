@@ -7,7 +7,7 @@ import { WebConsoleService } from '../../services/web-console.service';
 import { Subscription, Subject } from 'rxjs';
 import { webSocket } from 'rxjs/webSocket';
 import { WebServiceMessage } from '../../handlers/project-web-service-handler';
-// import { ProjectService } from '../../services/project.service';
+import { ProjectService } from '../../services/project.service';
 
 @Component({
     selector: 'app-web-console',
@@ -27,7 +27,7 @@ export class WebConsoleComponent implements OnInit, OnDestroy {
     
     constructor(
         private webConsoleService: WebConsoleService,
-        //private projectService: ProjectService
+        private projectService: ProjectService
     ){}
 
     ngOnInit() {
@@ -38,7 +38,10 @@ export class WebConsoleComponent implements OnInit, OnDestroy {
 
             this.node = node;
 
+            this.ws = webSocket(this.projectService.notificationsPath(this.server, this.project.project_id));
+            console.log(this.projectService.notificationsPath(this.server, this.project.project_id));
             this.ws = webSocket(this.webConsoleService.telnetPath(this.server, this.project.project_id, this.node.node_id));
+            console.log(this.webConsoleService.telnetPath(this.server, this.project.project_id, this.node.node_id));
             //this.ws = webSocket(this.projectService.notificationsPath(this.server, this.project.project_id));
             const telnetSubscription = this.ws.subscribe((message: any) => {
                 console.log(message);
