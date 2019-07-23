@@ -8,6 +8,7 @@ import { Subscription, Subject } from 'rxjs';
 import { webSocket } from 'rxjs/webSocket';
 import { WebServiceMessage } from '../../handlers/project-web-service-handler';
 import { ProjectService } from '../../services/project.service';
+import { ToasterService } from '../../services/toaster.service';
 
 @Component({
     selector: 'app-web-console',
@@ -22,13 +23,14 @@ export class WebConsoleComponent implements OnInit, OnDestroy {
     public node: Node;
 
     private subscriptions: Subscription[] = [];
-    private ws: Subject<any>;
+    private ws: WebSocket;
     private terminal: Terminal;
     
     constructor(
         private webConsoleService: WebConsoleService,
-        private projectService: ProjectService
-    ){}
+        private projectService: ProjectService,
+        private toasterService: ToasterService
+    ) {}
 
     ngOnInit() {
         const subscription = this.webConsoleService.startConsole.subscribe((node: Node) => {
@@ -38,18 +40,38 @@ export class WebConsoleComponent implements OnInit, OnDestroy {
 
             this.node = node;
 
-            this.ws = webSocket(this.projectService.notificationsPath(this.server, this.project.project_id));
+            this.ws = new WebSocket(this.projectService.notificationsPath(this.server, this.project.project_id));
             console.log(this.projectService.notificationsPath(this.server, this.project.project_id));
-            this.ws = webSocket(this.webConsoleService.telnetPath(this.server, this.project.project_id, this.node.node_id));
+            this.ws = new WebSocket(this.webConsoleService.telnetPath(this.server, this.project.project_id, this.node.node_id));
             console.log(this.webConsoleService.telnetPath(this.server, this.project.project_id, this.node.node_id));
-            //this.ws = webSocket(this.projectService.notificationsPath(this.server, this.project.project_id));
-            const telnetSubscription = this.ws.subscribe((message: any) => {
-                console.log(message);
-            });
-            this.subscriptions.push(telnetSubscription);
+
+            this.ws.onopen = (ev: Event) => {
+                console.log(ev);
+            };
+
+            this.ws.onmessage = (ev: Event) => {
+                console.log(ev);
+            };
+
+            this.ws.onerror = (ev: Event) => {
+                this.toasterService.error('Connection to host lost.')
+            };
+
+            this.ws.onclose = (ev: Event) => {
+                this.toasterService.success('Connection to host closed.')
+            };
+
+            // const telnetSubscription = this.ws.subscribe((message: any) => {
+            //     console.log(message);
+            // });
+            // this.subscriptions.push(telnetSubscription);
         });
 
         this.subscriptions.push(subscription);
+    }
+
+    sendMessage() {
+        this.ws.send('message');
     }
 
     ngOnDestroy() {
