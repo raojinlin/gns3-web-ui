@@ -9,6 +9,14 @@ import { webSocket } from 'rxjs/webSocket';
 import { WebServiceMessage } from '../../handlers/project-web-service-handler';
 import { ProjectService } from '../../services/project.service';
 import { ToasterService } from '../../services/toaster.service';
+import { delay } from 'rxjs/operators';
+import { FormControl } from '@angular/forms';
+
+export interface NodeConsole {
+    id: number,
+    node: Node,
+    webSocket: WebSocket
+}
 
 @Component({
     selector: 'app-web-console',
@@ -17,14 +25,17 @@ import { ToasterService } from '../../services/toaster.service';
     styleUrls: ['./web-console.component.scss']
 })
 export class WebConsoleComponent implements OnInit, OnDestroy {
-    @ViewChild('terminal') terminalDiv: ElementRef;
+    @ViewChild('tab') matTab: ElementRef;
     @Input() server: Server;
     @Input() project: Project;
-    public node: Node;
 
+    public nodeConsoles: NodeConsole[] = [];
     private subscriptions: Subscription[] = [];
-    private ws: WebSocket;
     private terminal: Terminal;
+    private nodeCounter: number = 0;
+
+    tabs = [];
+    selected = new FormControl(0);
     
     constructor(
         private webConsoleService: WebConsoleService,
@@ -34,44 +45,54 @@ export class WebConsoleComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         const subscription = this.webConsoleService.startConsole.subscribe((node: Node) => {
-            this.terminal = new Terminal();
-            this.terminal.open(this.terminalDiv.nativeElement);
-            this.terminal.writeln(node.name + '>');
+            // this.terminal = new Terminal();
+            // this.terminal.open(this.terminalDiv.nativeElement);
+            // this.terminal.writeln(node.name + '>');
 
-            this.node = node;
+            let ws = new WebSocket(this.webConsoleService.telnetPath(this.server, this.project.project_id, node.node_id));
 
-            this.ws = new WebSocket(this.projectService.notificationsPath(this.server, this.project.project_id));
-            console.log(this.projectService.notificationsPath(this.server, this.project.project_id));
-            this.ws = new WebSocket(this.webConsoleService.telnetPath(this.server, this.project.project_id, this.node.node_id));
-            console.log(this.webConsoleService.telnetPath(this.server, this.project.project_id, this.node.node_id));
-
-            this.ws.onopen = (ev: Event) => {
-                console.log(ev);
+            ws.onopen = async (ev: Event) => {
+                ws.send('message');
             };
 
-            this.ws.onmessage = (ev: Event) => {
-                console.log(ev);
+            ws.onmessage = (ev: Event) => {
+                console.log("Received message", ev);
             };
 
-            this.ws.onerror = (ev: Event) => {
-                this.toasterService.error('Connection to host lost.')
+            ws.onerror = (ev: Event) => {
+                this.toasterService.error('Connection to host lost.');
             };
 
-            this.ws.onclose = (ev: Event) => {
-                this.toasterService.success('Connection to host closed.')
+            ws.onclose = (ev: Event) => {
+                this.toasterService.success('Connection to host closed.');
             };
 
-            // const telnetSubscription = this.ws.subscribe((message: any) => {
-            //     console.log(message);
-            // });
-            // this.subscriptions.push(telnetSubscription);
+            this.nodeCounter++;
+            let nodeConsole : NodeConsole = {
+                id: this.nodeCounter,
+                node: node,
+                webSocket: ws
+            }
+            this.nodeConsoles.push(nodeConsole);
+            this.openNewTab(node);
         });
 
         this.subscriptions.push(subscription);
     }
 
-    sendMessage() {
-        this.ws.send('message');
+    openNewTab(node: Node) {
+        this.tabs.push(node.name);
+        this.selected.setValue(this.tabs.length - 1);
+    }
+
+    closeTab(index: number) {
+        this.tabs.splice(index, 1);
+        this.nodeConsoles[index].webSocket.close();
+        this.nodeConsoles.splice(index, 1);
+
+        if (this.tabs.length === 0) {
+            this.webConsoleService.isConsoleOpen.emit(false);
+        }
     }
 
     ngOnDestroy() {

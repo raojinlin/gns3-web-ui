@@ -1,2 +1,15 @@
-<div #terminal></div>
-<button>open</button>
+<mat-tab-group [selectedIndex]="selected.value"
+               (selectedIndexChange)="selected.setValue($event)" #tab>
+  <mat-tab *ngFor="let tab of tabs; let index = index" [label]="tab">
+    <ng-template mat-tab-label>
+        {{nodeConsoles[index].node.name}}
+        <button mat-button (click)="closeTab(index)">
+            <mat-icon>close</mat-icon>
+        </button>
+    </ng-template>
+    <!-- <div #terminal></div> -->
+    <div>
+        terminal is running...
+    </div>
+  </mat-tab>
+</mat-tab-group>
