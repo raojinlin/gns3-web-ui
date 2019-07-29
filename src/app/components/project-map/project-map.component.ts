@@ -51,6 +51,7 @@ import { LabelWidget } from '../../cartography/widgets/label';
 import { MapLinkNodeToLinkNodeConverter } from '../../cartography/converters/map/map-link-node-to-link-node-converter';
 import { ProjectMapMenuComponent } from './project-map-menu/project-map-menu.component';
 import { WebConsoleService } from '../../services/web-console.service';
+import { ToasterService } from '../../services/toaster.service';
 
 
 @Component({
@@ -66,7 +67,7 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
   public symbols: Symbol[] = [];
   public project: Project;
   public server: Server;
-  private ws: Subject<any>;
+  public ws: WebSocket;
   public isProjectMapMenuVisible: boolean = false;
   public isConsoleVisible: boolean = false;
 
@@ -80,9 +81,9 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
   protected settings: Settings;
   private inReadOnlyMode = false;
 
-  @ViewChild(ContextMenuComponent) contextMenu: ContextMenuComponent;
-  @ViewChild(D3MapComponent) mapChild: D3MapComponent;
-  @ViewChild(ProjectMapMenuComponent) projectMapMenuComponent: ProjectMapMenuComponent;
+  @ViewChild(ContextMenuComponent, {static: false}) contextMenu: ContextMenuComponent;
+  @ViewChild(D3MapComponent, {static: false}) mapChild: D3MapComponent;
+  @ViewChild(ProjectMapMenuComponent, {static: false}) projectMapMenuComponent: ProjectMapMenuComponent;
 
   private subscriptions: Subscription[] = [];
 
@@ -116,7 +117,8 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
     private movingEventSource: MovingEventSource,
     private mapScaleService: MapScaleService,
     private nodeCreatedLabelStylesFixer: NodeCreatedLabelStylesFixer,
-    private webConsoleService: WebConsoleService
+    private webConsoleService: WebConsoleService,
+    private toasterService: ToasterService
   ) {}
 
   ngOnInit() {
@@ -231,9 +233,15 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
   }
 
   setUpWS(project: Project) {
-    this.ws = webSocket(this.projectService.notificationsPath(this.server, project.project_id));
+    this.ws = new WebSocket(this.projectService.notificationsPath(this.server, project.project_id));
 
-    this.subscriptions.push(this.projectWebServiceHandler.connect(this.ws));
+    this.ws.onmessage = (event: MessageEvent) => {
+      this.projectWebServiceHandler.handleMessage(JSON.parse(event.data));
+    };
+
+    this.ws.onerror = (event: MessageEvent) => {
+      this.toasterService.error('Connection to host lost.');
+    };
   }
 
   setUpMapCallbacks() {
@@ -413,8 +421,8 @@ export class ProjectMapComponent implements OnInit, OnDestroy {
     this.nodesDataSource.clear();
     this.linksDataSource.clear();
 
-    if (this.ws) {
-      this.ws.unsubscribe();
+    if (this.ws.OPEN) {
+      this.ws.close();
     }
     this.subscriptions.forEach((subscription: Subscription) => subscription.unsubscribe());
   }
