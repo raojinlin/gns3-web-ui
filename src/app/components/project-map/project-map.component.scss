@@ -96,7 +96,7 @@ mat-divider.divider {
 #zoom-buttons {
   position: fixed;
   background: #263238;
-  bottom: 20px;
+  bottom: 270px;
   right: 20px;
   display: grid;
 
@@ -232,10 +232,11 @@ g.node text,
 }
 
 .console {
-  width: 400px;
-  height: 300px;
+  width: 100%;
+  height: 250px;
   position: fixed;
   background: #263238;
   bottom: 0px;
   right: 0px;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }

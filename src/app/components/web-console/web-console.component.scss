@@ -1,1 +1,8 @@
 @import 'xterm/dist/xterm.css';
+
+.navigation-buttons {
+    position: fixed;
+    background: #263238;
+    bottom: 210px;
+    right: 10px;
+}

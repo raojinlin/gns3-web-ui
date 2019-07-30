@@ -9008,8 +9008,8 @@ xtend@~2.1.1:
 
 xterm@^3.14.5:
   version "3.14.5"
-  resolved "http://dev-brn-art-02.swdev.local:8081/artifactory/api/npm/npm/xterm/-/xterm-3.14.5.tgz#c9d14e48be6873aa46fb429f22f2165557fd2dea"
-  integrity sha1-ydFOSL5oc6pG+0KfIvIWVVf9Leo=
+  resolved "https://registry.npmjs.org/xterm/-/xterm-3.14.5.tgz#c9d14e48be6873aa46fb429f22f2165557fd2dea"
+  integrity sha512-DVmQ8jlEtL+WbBKUZuMxHMBgK/yeIZwkXB81bH+MGaKKnJGYwA+770hzhXPfwEIokK9On9YIFPRleVp/5G7z9g==
 
 y18n@^3.2.1:
   version "3.2.1"

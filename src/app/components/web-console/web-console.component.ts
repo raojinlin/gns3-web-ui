@@ -25,7 +25,7 @@ export interface NodeConsole {
     styleUrls: ['./web-console.component.scss']
 })
 export class WebConsoleComponent implements OnInit, OnDestroy {
-    @ViewChild('tab') matTab: ElementRef;
+    @ViewChild('tab', {static: false}) matTab: ElementRef;
     @Input() server: Server;
     @Input() project: Project;
 
