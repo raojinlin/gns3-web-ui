@@ -1628,10 +1628,10 @@ angular2-draggable@^2.3.2:
   dependencies:
     tslib "^1.9.0"
 
-angular2-hotkeys@^2.1.5:
-  version "2.1.5"
-  resolved "https://registry.npmjs.org/angular2-hotkeys/-/angular2-hotkeys-2.1.5.tgz#d4d5df7cecd231d556089832609283f37674fdea"
-  integrity sha512-HiAnK1pW7lns5LpxtRsdkRRb5iVa7fv8Cf69Jye6l9gI6/IyvaVDptRtsWmdIG7VAr2Ngz6Yeehkym39O/LdgA==
+angular2-hotkeys@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/angular2-hotkeys/-/angular2-hotkeys-2.2.0.tgz#7b52ba99c42c56656360953ab79d776f583d1ab8"
+  integrity sha512-2O2wtPyscQU/PtyPc+TefSHAql0VI51rrKyIt87YAvBaGUZEj5PZG2QtC7kYI3sFhXYlvrNefUxXoehFjEVQAQ==
   dependencies:
     "@types/mousetrap" "^1.6.0"
     mousetrap "^1.6.0"
