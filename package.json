@@ -53,7 +53,7 @@
     "angular-persistence": "^1.0.1",
     "angular-resizable-element": "^3.2.6",
     "angular2-draggable": "^2.3.2",
-    "angular2-hotkeys": "^2.1.5",
+    "angular2-hotkeys": "^2.2.0",
     "angular2-indexeddb": "^1.2.3",
     "bootstrap": "4.3.1",
     "command-exists": "^1.2.8",
