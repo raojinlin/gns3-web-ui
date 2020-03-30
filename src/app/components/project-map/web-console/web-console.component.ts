@@ -29,7 +29,8 @@ export class WebConsoleComponent implements OnInit, AfterViewInit {
     ) {}
     
     ngOnInit() {
-        this.consoleService.consoleResized.subscribe(ev => {
+        this.consoleService.consoleResized.subscribe(event => {
+            this.term.resize(event.numberOfColumns + 10, event.numberOfRows + 10);
             this.fitAddon.fit();
         });
     }

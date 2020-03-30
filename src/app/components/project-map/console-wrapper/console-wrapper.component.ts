@@ -23,8 +23,6 @@ export class ConsoleWrapperComponent implements OnInit {
     selectedFilter: string = 'all';
 
     public style: object = {};
-    public styleInside: object = { height: `120px` };
-
     public isDraggingEnabled: boolean = false;
     public isLightThemeEnabled: boolean = false;
 
@@ -38,7 +36,7 @@ export class ConsoleWrapperComponent implements OnInit {
     
     ngOnInit() {
         this.themeService.getActualTheme() === 'light' ? this.isLightThemeEnabled = true : this.isLightThemeEnabled = false; 
-        this.style = { bottom: '20px', left: '20px', width: '720px', height: '456px'};
+        this.style = { bottom: '20px', left: '20px', width: `${this.consoleService.defaultConsoleWidth}px`, height: `${this.consoleService.defaultConsoleHeight + 48}px`};
 
         this.consoleService.nodeConsoleTrigger.subscribe((node) => {
             this.addTab(node, true);
@@ -95,32 +93,33 @@ export class ConsoleWrapperComponent implements OnInit {
     }
 
     validate(event: ResizeEvent): boolean {
-        if (
-            event.rectangle.width &&
-            event.rectangle.height &&
-            (event.rectangle.width < 720 ||
-            event.rectangle.height < 456)
-        ) {
-            return false;
-        }
+        // if (
+        //     event.rectangle.width &&
+        //     event.rectangle.height &&
+        //     (event.rectangle.width < 720 ||
+        //     event.rectangle.height < 456)
+        // ) {
+        //     return false;
+        // }
         return true;
     }
 
     onResizeEnd(event: ResizeEvent): void {
+        let width = Math.round(event.rectangle.width / this.consoleService.getLineWidth()) * this.consoleService.getLineWidth();
+        let height = Math.round((event.rectangle.height - 48) / this.consoleService.getLineHeight()) * this.consoleService.getLineHeight();
+
         this.style = {
             position: 'fixed',
             left: `${event.rectangle.left}px`,
             top: `${event.rectangle.top}px`,
-            width: `${event.rectangle.width}px`,
-            height: `${event.rectangle.height}px`
+            width: `${width}px`,
+            height: `${height}px`
         };
 
-        this.styleInside = {
-            height: `${event.rectangle.height - 60}px`,
-            width: `${event.rectangle.width}px`
-        };
-
-        this.consoleService.resizeTerminal();
+        this.consoleService.resizeTerminal({
+            numberOfColumns: Math.round(event.rectangle.width / this.consoleService.getLineWidth()),
+            numberOfRows: Math.round((event.rectangle.height - 48) / this.consoleService.getLineHeight())
+        });
     }
 
     close() {
