@@ -73,7 +73,7 @@
     "notosans-fontface": "^1.1.0",
     "raven-js": "^3.27.2",
     "rxjs": "^6.5.3",
-    "rxjs-compat": "^6.5.3",
+    "rxjs-compat": "6.5.4",
     "save-html-as-image": "^1.2.0",
     "save-svg-as-png": "^1.4.14",
     "svg-crowbar": "^0.2.4",
